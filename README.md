@@ -73,3 +73,12 @@ The completed run produced correct predictions for the three shared explanation 
 The comparison uses the same three local test flows for both models. In the completed run, SHAP selected the same top features on repeated runs for every sample, giving a stability overlap of 1.0. LIME had lower but non-zero overlap, ranging from approximately 0.43 to 0.67, because it fits a stochastic local surrogate.
 
 The masking experiment showed larger attack-probability changes for SHAP on these samples, indicating stronger measured local faithfulness for this run. LIME remained useful because its interval-based rules are compact and easy to read. The methods generally agreed on prediction direction and recurring features such as 'Destination Port', protocol, and packet-length features, but disagreements are expected when correlated features share influence or when the local surrogate approximates a nonlinear Random Forest decision.
+
+## Step 5 conclusion
+
+The feature selection for BRBES are based on the results from the SHAP analysis.
+Our global SHAP anaylsis identified which two features was of most importance for each model, for supervised we found that Destination Port and Packet Length Std was of most importance and for semi-supervised we found that Destination Port and Bwd Packet Length Std was the important features.
+These features was then checked against the local LIME explanations. As seen in the table above the destination port appeared in all three local Lime explanations for the supervised learning, while the packet length did not appear among the local Lime explanations.
+For the semi-supervised model both our features from the SHAP analysis appeared in the local LIME explanation.
+This partial disagreement we could see for the supervised model is not unexpected, since SHAP ranks the features using global importance across the balanced evalutation sample, while LIME explains it locally.
+The feature selection for BRBES is therefore based on the gliabl SHAP ranking and we're using LIME as a local consistence check.
