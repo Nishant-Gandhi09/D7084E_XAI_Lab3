@@ -1,11 +1,14 @@
 # D7084E XAI Lab 3
 
-This notebook currently implements the first two explanation stages of Lab 3 for the CICIDS2017 intrusion-detection data:
+This notebook implements the explanation and rule-building stages of Lab 3 for the CICIDS2017 intrusion-detection data:
 
 1. **SHAP explanations** for a supervised detector and a semi-supervised detector.
 2. **LIME explanations** for the same predictions used by SHAP.
+3. **Explanation comparison** for faithfulness, stability, and readability.
+4. **Feature selection for BRBES** using the top two SHAP features for each model.
+5. **Belief rule base construction** for each detector using the selected features.
 
-The notebook is intentionally limited to these stages for now. BRBES construction, explanation comparison metrics, and the optional self-supervised detector will be added later.
+The notebook is now focused on the Lab 3 objectives and does not include the earlier extra Lab 2 experiments.
 
 ## Implemented so far
 
@@ -27,7 +30,11 @@ The notebook is intentionally limited to these stages for now. BRBES constructio
 - Ranks global feature importance using mean absolute SHAP values for both learning paradigms.
 - Selects the two most important SHAP features for each model as inputs for the BRBES implementation.
 - Checks the SHAP-selected features against the local LIME explanations as a local consistency check.
-- Selects `Destination Port` and `Packet Length Std` for the supervised BRBES, and `Destination Port` and `Bwd Packet Length Std` for the semi-supervised BRBES.
+- Selects 'Destination Port' and 'Packet Length Std' for the supervised BRBES, and 'Destination Port' and 'Bwd Packet Length Std' for the semi-supervised BRBES.
+- Builds a BRBES for each model using Low/Medium/High states for the selected features and data-derived Low/Medium/High risk beliefs.
+- Stores explicit rule weights theta = 1 and attribute weights delta = 1 for every rule because no expert weighting was specified.
+- Implements fuzzy input transformation, normalized rule activation, missing-input ignorance, ER-style belief aggregation, and a utility-based Attack/Benign decision.
+- Evaluates the BRBES on the same explanation samples and reports risk beliefs, ignorance, utility, and the final decision.
 
 ## Requirements
 
@@ -82,3 +89,7 @@ These features was then checked against the local LIME explanations. As seen in 
 For the semi-supervised model both our features from the SHAP analysis appeared in the local LIME explanation.
 This partial disagreement we could see for the supervised model is not unexpected, since SHAP ranks the features using global importance across the balanced evalutation sample, while LIME explains it locally.
 The feature selection for BRBES is therefore based on the gliabl SHAP ranking and we're using LIME as a local consistence check.
+
+## Step 6 BRB construction
+
+The final stage creates one BRBES per model using the selected SHAP features. Each feature is transformed into Low/Medium/High matching degrees using training-data cut points. For every feature-state combination, the rule stores a three-level risk belief distribution derived from the training attack share, rule weight theta = 1, and attribute weights delta = 1. The inference stage normalizes rule activation, preserves missing-input ignorance, combines the evidence with ER-style aggregation, and converts the final risk distribution into a utility score. The 33rd and 67th percentiles are only a transparent three-bin design choice; they are not stated as mandatory values in the lab sheet.
