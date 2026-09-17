@@ -24,6 +24,10 @@ The notebook is intentionally limited to these stages for now. BRBES constructio
 - Measures faithfulness by masking the top five features and recording the change in attack probability.
 - Measures stability by repeating explanations and calculating top-feature overlap.
 - Reports qualitative strengths and limitations of each explanation method.
+- Ranks global feature importance using mean absolute SHAP values for both learning paradigms.
+- Selects the two most important SHAP features for each model as inputs for the BRBES implementation.
+- Checks the SHAP-selected features against the local LIME explanations as a local consistency check.
+- Selects `Destination Port` and `Packet Length Std` for the supervised BRBES, and `Destination Port` and `Bwd Packet Length Std` for the semi-supervised BRBES.
 
 ## Requirements
 
