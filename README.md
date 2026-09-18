@@ -18,7 +18,7 @@ The notebook is now focused on the Lab 3 objectives and does not include the ear
 - Removes duplicate flows and converts invalid numeric values to missing values.
 - Creates fixed stratified train, validation, and test partitions using 'SEED = 42'.
 - Trains a supervised Random Forest using all labelled training data.
-- Trains a semi-supervised Random Forest with 10% labelled data and iterative pseudo-labelling.
+- Trains a semi-supervised Random Forest with a documented 10% labelled-data budget and iterative pseudo-labelling.
 - Uses median imputation inside each model pipeline and balanced Random Forest class weights.
 - Uses the same three held-out test flows for both SHAP and LIME.
 - Produces SHAP global bar plots, SHAP beeswarm plots, and local waterfall plots.
@@ -30,7 +30,7 @@ The notebook is now focused on the Lab 3 objectives and does not include the ear
 - Ranks global feature importance using mean absolute SHAP values for both learning paradigms.
 - Selects the two most important SHAP features for each model as inputs for the BRBES implementation.
 - Checks the SHAP-selected features against the local LIME explanations as a local consistency check.
-- Selects 'Destination Port' and 'Packet Length Std' for the supervised BRBES, and 'Destination Port' and 'Bwd Packet Length Std' for the semi-supervised BRBES.
+- Selects the top SHAP features from the current run for the supervised and semi-supervised BRBES.
 - Builds a BRBES for each model using Low/Medium/High states for the selected features and data-derived Low/Medium/High risk beliefs.
 - Stores explicit rule weights theta = 1 and attribute weights delta = 1 for every rule because no expert weighting was specified.
 - Implements fuzzy input transformation, normalized rule activation, missing-input ignorance, ER-style belief aggregation, and a utility-based Attack/Benign decision.
@@ -67,7 +67,7 @@ The full dataset contains approximately 2.8 million cleaned flows, so model trai
 
 ## Current observed explanation pattern
 
-The completed run produced correct predictions for the three shared explanation samples: two benign flows and one attack flow for each paradigm. Both models repeatedly identified 'Destination Port', packet-size features, and packet-length statistics among the strongest explanations, although local LIME feature ranges vary by sample.
+The completed run uses three shared held-out explanation samples. Their true labels and predictions are printed in the SHAP and LIME cells, so the narrative should be read from those outputs rather than assuming a fixed class order. Both models repeatedly identified 'Destination Port', packet-size features, and packet-length statistics among the strongest explanations, although local LIME feature ranges vary by sample.
 
 ## Reproducibility
 
@@ -76,6 +76,7 @@ The completed run produced correct predictions for the three shared explanation 
 - Pseudo-labelling confidence threshold: '0.95'
 - Maximum pseudo-labelling rounds: '10'
 - Semi-supervised labelled budget: '10%'
+- Final data mode: 'USE_SAMPLE = False' (full cleaned dataset)
 
 ## Step 4 comparison results
 
@@ -98,7 +99,17 @@ The final stage creates one BRBES per model using the selected SHAP features. Ea
 
 ## Step 7 conclusion
 
-The supervised BRBES classified all three samples as benign, meaing that it identifies the benign samples correctly, however it missed both attack samples. Meanwhile the semi-supervised BRBES classified sample 2 as attack and sample 3 as benign, but missas the attack in sample 1. 
-The utility values follows the threshold 50 just as it should, all values under 50 becomes benign, while sample 2 for the semi-supervised gets 55.1565 and classifies as attack.
-The results also shows that the inference process can preserve explicit ignorance when available rule evidence doesn't fully support one of our definied risk states (low/med/high).
-The samples presented here are only used to demonstrate the BRBES inference process. The performance of each BRBES is evaluated in the upcoming steps.
+The BRBES demonstration uses the same three explanation samples as SHAP and LIME. The utility threshold is 50: utilities below 50 are labelled Benign and utilities at or above 50 are labelled Attack. The inference output also reports explicit ignorance. These samples demonstrate the inference process; the full test-set metrics below are the performance results.
+
+## Full-data Step 8 results
+
+The latest run used 'USE_SAMPLE = False' and completed all notebook cells successfully.
+
+| Paradigm | Model | Accuracy | Macro-F1 | Recall | ROC-AUC | FAR |
+|---|---|---:|---:|---:|---:|---:|
+| Supervised | Black-box | 0.9996 | 0.9994 | 0.9994 | 1.0000 | 0.0003 |
+| Supervised | BRBES | 0.8045 | 0.4458 | 0.0000 | 0.7995 | 0.0000 |
+| Semi-supervised | Black-box | 0.9989 | 0.9982 | 0.9970 | 0.9998 | 0.0007 |
+| Semi-supervised | BRBES | 0.8045 | 0.4458 | 0.0000 | 0.7995 | 0.0000 |
+
+The two-feature BRBES loses substantial attack recall compared with the black-box models. This is an important transparency-versus-performance finding, not a claim that the BRBES matches the detector. Because BRBES recall is zero in this run, the report should emphasize macro-F1 and recall rather than accuracy alone.
