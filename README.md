@@ -35,6 +35,8 @@ The notebook is now focused on the Lab 3 objectives and does not include the ear
 - Stores explicit rule weights theta = 1 and attribute weights delta = 1 for every rule because no expert weighting was specified.
 - Implements fuzzy input transformation, normalized rule activation, missing-input ignorance, ER-style belief aggregation, and a utility-based Attack/Benign decision.
 - Evaluates the BRBES on the same explanation samples and reports risk beliefs, ignorance, utility, and the final decision.
+- Runs both BRB expert systems on the same three held-out samples used for SHAP and LIME.
+- Reports the resulting risk beliefs, explicit ignorance, utility scores, and final Attack/Benign decisions for the Step 7 demonstration.
 
 ## Requirements
 
@@ -93,3 +95,10 @@ The feature selection for BRBES is therefore based on the gliabl SHAP ranking an
 ## Step 6 BRB construction
 
 The final stage creates one BRBES per model using the selected SHAP features. Each feature is transformed into Low/Medium/High matching degrees using training-data cut points. For every feature-state combination, the rule stores a three-level risk belief distribution derived from the training attack share, rule weight theta = 1, and attribute weights delta = 1. The inference stage normalizes rule activation, preserves missing-input ignorance, combines the evidence with ER-style aggregation, and converts the final risk distribution into a utility score. The 33rd and 67th percentiles are only a transparent three-bin design choice; they are not stated as mandatory values in the lab sheet.
+
+## Step 7 conclusion
+
+The supervised BRBES classified all three samples as benign, meaing that it identifies the benign samples correctly, however it missed both attack samples. Meanwhile the semi-supervised BRBES classified sample 2 as attack and sample 3 as benign, but missas the attack in sample 1. 
+The utility values follows the threshold 50 just as it should, all values under 50 becomes benign, while sample 2 for the semi-supervised gets 55.1565 and classifies as attack.
+The results also shows that the inference process can preserve explicit ignorance when available rule evidence doesn't fully support one of our definied risk states (low/med/high).
+The samples presented here are only used to demonstrate the BRBES inference process. The performance of each BRBES is evaluated in the upcoming steps.
