@@ -14,9 +14,13 @@ The notebook is now focused on the Lab 3 objectives and does not include the ear
 
 Install the dependencies once in the notebook environment:
 
-#python
-%pip3 install -r requirements.txt
-%pip3 install shap lime
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+pip install shap lime
+```
 
 
 The main libraries are 'pandas', 'numpy', 'scikit-learn', 'matplotlib', 'seaborn', 'shap', and 'lime'.
